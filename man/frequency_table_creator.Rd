@@ -9,6 +9,7 @@ frequency_table_creator(
   text_field = NULL,
   grouping_variable = NULL,
   grouping_variable_target = NULL,
+  lemmatize = FALSE,
   remove_punct = FALSE,
   remove_symbols = FALSE,
   remove_numbers = FALSE,
@@ -28,6 +29,9 @@ frequencies.}
 \item{grouping_variable_target}{a string; the value of the variable
 to use to create the target corpus. All the other values of this variable will
 be grouped into a reference corpus.}
+
+\item{lemmatize}{logical; if \code{TRUE}, the text will be lemmatized before
+frequency calculation.}
 
 \item{remove_punct}{logical; if \code{TRUE}, punctuation will be
 removed when calculating the word frequency table.}
@@ -53,4 +57,8 @@ specifying the grouping variable (denoting belonging of documents to corpora)
 and the target value of the grouping variable (where the documents with the
 matching value of the grouping variable are sorted into the target corpus,
 while all the remaining documents are sorted into the refeence corpus).
+}
+\details{
+Relies on textstem package for lemmatization and
+quanteda package for frequency calculation
 }

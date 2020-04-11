@@ -18,6 +18,8 @@
 #' @param grouping_variable_target a string; the value of the variable
 #' to use to create the target corpus. All the other values of this variable will
 #' be grouped into a reference corpus.
+#' @param lemmatize logical; if \code{TRUE}, the text will be lemmatized before
+#' frequency calculation.
 #' @param remove_punct logical; if \code{TRUE}, punctuation will be
 #' removed when calculating the word frequency table.
 #' @param remove_symbols logical; if \code{TRUE}, symbols will be
@@ -29,6 +31,9 @@
 #'
 #'@return A dataframe with word frequencies in the target and reference corpora.
 #'
+#'@details Relies on textstem package for lemmatization and
+#'quanteda package for frequency calculation
+#'
 #'@export
 #'
 
@@ -36,6 +41,7 @@ frequency_table_creator <-  function(df,
                                      text_field = NULL,
                                      grouping_variable = NULL,
                                      grouping_variable_target = NULL,
+                                     lemmatize = FALSE,
                                      remove_punct = FALSE,
                                      remove_symbols = FALSE,
                                      remove_numbers = FALSE,
@@ -54,6 +60,13 @@ frequency_table_creator <-  function(df,
   if (is.null(grouping_variable_target)) {
     stop("You have not specified the value of the grouping variable denoting the
   target corpus.")
+  }
+
+  if (lemmatize) {
+
+   df <- lemmatizing_function(df, text_field = text_field)
+   text_field <- "text_lemmatized"
+
   }
 
 
