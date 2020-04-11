@@ -20,13 +20,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$log_likelihood),]
+        sorted_measures <- measures[order(measures$word_use, -measures$log_likelihood),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$log_likelihood),]
+        sorted_measures <- measures[order(measures$word_use, measures$log_likelihood),]
 
       }}
 
@@ -34,13 +34,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$perc_diff),]
+        sorted_measures <- measures[order(measures$word_use, -measures$perc_diff),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$perc_diff),]
+        sorted_measures <- measures[measures$word_use, order(measures$perc_diff),]
 
       }
     }
@@ -49,13 +49,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$bic),]
+        sorted_measures <- measures[order(measures$word_use, -measures$bic),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$bic),]
+        sorted_measures <- measures[order(measures$word_use, measures$bic),]
 
       }
     }
@@ -64,13 +64,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$ell),]
+        sorted_measures <- measures[order(measures$word_use, -measures$ell),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$ell),]
+        sorted_measures <- measures[order(measures$word_use, measures$ell),]
 
       }
     }
@@ -79,13 +79,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$relative_risk),]
+        sorted_measures <- measures[order(measures$word_use, -measures$relative_risk),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$relative_risk),]
+        sorted_measures <- measures[order(measures$word_use, measures$relative_risk),]
 
       }
     }
@@ -94,13 +94,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$log_ratio),]
+        sorted_measures <- measures[order(measures$word_use, -measures$log_ratio),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$log_ratio),]
+        sorted_measures <- measures[order(measures$word_use, measures$log_ratio),]
 
       }
     }
@@ -109,13 +109,13 @@ sorting_function <- function(measures,
 
       if (sort == "decreasing") {
 
-        sorted_measures <- measures[order(-measures$log_ratio),]
+        sorted_measures <- measures[order(measures$word_use, -measures$log_ratio),]
 
       }
 
       if (sort == "increasing") {
 
-        sorted_measures <- measures[order(measures$log_ratio),]
+        sorted_measures <- measures[order(measures$word_use, measures$log_ratio),]
 
       }
     }

@@ -165,6 +165,7 @@ keyness_measure_calculator <- function(df,
   word <- character(nrow(df))
   freq_target_corpus <- numeric(nrow(df))
   freq_reference_corpus <- numeric(nrow(df))
+  word_use <- character(nrow(df))
 
   i <- 1
   nc1 <- sum(df[,2])
@@ -176,6 +177,8 @@ keyness_measure_calculator <- function(df,
     f2 <- df[i,3]
     freq_target_corpus[i]<- f1
     freq_reference_corpus[i] <- f2
+
+    word_use[i] <- over_under_evaluator(f1, f2, nc1, nc2)
 
 
     if (one) {
@@ -223,6 +226,7 @@ keyness_measure_calculator <- function(df,
   word <- as.character(unlist(word))
   freq_target_corpus <- as.numeric(unlist(freq_target_corpus))
   freq_reference_corpus <- as.numeric(unlist(freq_reference_corpus))
+  word_use <- as.character(unlist(word_use))
 
   log_likelihood <- unlist(log_likelihood)
   ell <- unlist(ell)
@@ -232,7 +236,7 @@ keyness_measure_calculator <- function(df,
   log_ratio <- unlist(log_ratio)
   odds_ratio <- unlist(odds_ratio)
 
-  measures <- cbind.data.frame(word,freq_target_corpus,freq_reference_corpus, stringsAsFactors=FALSE)
+  measures <- cbind.data.frame(word,freq_target_corpus,freq_reference_corpus, word_use, stringsAsFactors=FALSE)
 
   if (one) {
 

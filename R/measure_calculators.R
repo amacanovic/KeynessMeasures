@@ -13,6 +13,27 @@ parameter_prep <- function(f1, f2, nc1, nc2) {
   return(parameter_output)
 }
 
+over_under_evaluator <- function(f1, f2, nc1, nc2){
+  parameters <- parameter_prep(f1, f2, nc1, nc2)
+  nf1 <- parameters$nf1
+  nf2 <- parameters$nf2
+
+  if (nf1 == nf2) {
+
+    over_under <- "equal"
+  }
+
+  if (nf1 > nf2) {
+
+    over_under <- "overuse"
+
+  }else{
+
+    over_under <- "underuse"
+  }
+  return(over_under)
+}
+
 #calculating the log likelihood value as per the paper:
 # Rayson, Paul, and Roger Garside. "Comparing corpora using frequency profiling."
 # Proceedings of the workshop on Comparing corpora-Volume 9. Association for
