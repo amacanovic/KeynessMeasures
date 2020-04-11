@@ -104,7 +104,7 @@ perc_diff_calculator <- function(f1, f2, nc1, nc2){
 bic_calculator <- function(f1, f2, nc1, nc2){
 
   degrees_freedom <- 1
-  log_likelihood_output <- log_likelihood_value(f1, f2, nc1, nc2)$log_likelihood
+  log_likelihood_output <- log_likelihood_calculator(f1, f2, nc1, nc2)$log_likelihood
 
   bic_calc <- log_likelihood_output-(degrees_freedom*log(nc1+nc2))
 
@@ -128,7 +128,7 @@ ell_calculator <-  function(f1, f2, nc1, nc2){
   e1 <- parameters$e1
   e2 <- parameters$e2
   min_expected_f <- min(e1, e2)
-  log_likelihood_output <- log_likelihood_value(f1, f2, nc1, nc2)$log_likelihood
+  log_likelihood_output <- log_likelihood_calculator(f1, f2, nc1, nc2)$log_likelihood
 
   ell_calc <- log_likelihood_output / (sum(nc1 + nc2) * log(min_expected_f))
 

@@ -100,10 +100,10 @@ frequency_table_creator <-  function(df,
                                      levels = c(TRUE, FALSE),
                                      labels = c("target", "reference"))
 
-  dfm_grouped <- dfm_group(dfm,
+  dfm_grouped <- quanteda::dfm_group(dfm,
                            groups=grouping_variable_factor)
 
-  frequency_table <- convert(dfm_grouped,
+  frequency_table <- quanteda::convert(dfm_grouped,
                              to="data.frame")
 
   rownames(frequency_table) <- frequency_table[, 1]
