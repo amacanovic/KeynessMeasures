@@ -3,7 +3,7 @@ title: "KeynessMeasures: Calculate significance and effect size measures of word
 author: "Ana Macanović"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{KeynessMeasures: Calculate significance and effect size measures of word keyness}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

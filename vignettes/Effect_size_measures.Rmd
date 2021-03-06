@@ -3,7 +3,7 @@ title: "KeynessMeasures: Introduction to effect size measures"
 author: "Ana Macanović"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{KeynessMeasures: Introduction to effect size measures}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
