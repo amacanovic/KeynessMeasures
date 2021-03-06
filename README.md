@@ -28,18 +28,30 @@ To download the package from GitHub, use the following command:
 devtools::install_github("amacanovic/KeynessMeasures")
 ```
 
-## Demonstration
-
-Using the `keyness_measure_calculator()` function, one can easily obtain
-several measures of word keyness in a target corpus compared to the 
-reference corpus.
-
-First, loading the package:
+Then, load the package:
 
 ```r
 library(KeynessMeasures)
 ```
 
+For more information on included measures, type:
+
+```r
+vignette("Effect_size_measures")
+```
+
+For a detailed tutorial vignette, type:
+
+```r
+vignette("Keyness_Measures_Tutorial")
+```
+
+
+## Demonstration
+
+Using the `keyness_measure_calculator()` function, one can easily obtain
+several measures of word keyness in a target corpus compared to the 
+reference corpus.
 
 Demonstration using the Jane Austen data from the **janeaustenr** package (Silge, 2017).
 We will be exploring key words in her novel "Emma" compared to 5 other novels.
