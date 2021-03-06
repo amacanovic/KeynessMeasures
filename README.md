@@ -1,8 +1,6 @@
 ---
 title: "KeynessMeasures"
-author: "Ana Macanovic"
 output: github_document
-always_allow_html: true
 ---
 
 
