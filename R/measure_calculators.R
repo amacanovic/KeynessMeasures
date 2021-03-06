@@ -112,7 +112,7 @@ perc_diff_calculator <- function(f1, f2, nc1, nc2){
   return(result)
 }
 
-#Calculating the Bayes Information Criterion as per:
+#Calculating the Bayesian Information Criterion as per:
 # Wilson, Andrew (2013) Embracing Bayes factors for key item analysis in corpus
 # linguistics. In: New approaches to the study of linguistic variability. Language
 # Competence and Language Awareness in Europe . Peter Lang, Frankfurt, pp. 3-11.

@@ -1,0 +1,5 @@
+BIC value,interpretation
+0-2,no evidence against H0
+2-6,positive evidence against H0
+6-10,strong evidence against H0
+> 10,very strong evidence against H0

@@ -1,0 +1,119 @@
+---
+title: "KeynessMeasures"
+author: "Ana Macanovic"
+output:
+  html_document:
+    df_print: paged
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+An R package including multiple measures of word keyness used in computational
+linguistics. Introducing both statistical significance and effect size
+measures in several simple functions.
+
+
+This package currently supports the following measures:
+
+1.  **Statistical significance:** Log-likelihood ratio, Bayesian Information Criterion.
+
+2.  **Effect size:** Effect Size of Log Likelihood, %DIFF, The Relative Risk,
+The Log Ratio measure, The Odds Ratio.
+
+For more details on using the effect size measures, consult the vignette 
+"KeynessMeasures: Introduction to effect size measures". 
+
+## Installing the package
+
+This package can be installed from GitHub, using devtools. 
+
+To download the package from GitHub, use the following command:
+```{r, eval=F, message=FALSE, warning=FALSE}
+devtools::install_github("amacanovic/KeynessMeasures")
+```
+
+## Demonstration
+
+Using the `keyness_measure_calculator()` function, one can easily obtain
+several measures of word keyness in a target corpus compared to the 
+reference corpus.
+
+First, loading the package:
+```{r message=FALSE, warning=FALSE}
+library(KeynessMeasures)
+```
+
+
+Demonstration using the Jane Austen data from the **janeaustenr** package (Silge, 2017).
+We will be exploring key words in her novel "Emma" compared to 5 other novels.
+```{r, warning=FALSE, message=FALSE}
+
+jane_austen_data <- janeaustenr::austen_books()
+
+```
+
+First, obtaining the word frequencies in "Emma" (target corpus) and the other
+novels (reference corpus) using the `frequency_table()` function:
+```{r}
+frequency_table <- frequency_table_creator(jane_austen_data,
+                                           text_field = "text",
+                                           grouping_variable = "book",
+                                           grouping_variable_target = "Emma",
+                                           lemmatize = TRUE,
+                                           remove_punct = TRUE,
+                                           remove_symbols = TRUE,
+                                           remove_numbers = TRUE,
+                                           remove_url = TRUE)
+```
+
+Then, calculating all the keyness measures using the `keyness_measure_calculator()` function,
+sorting the entries by highest values of log likelihood:
+
+```{r}
+keyness_measures <- keyness_measure_calculator(
+  frequency_table,
+  log_likelihood = TRUE,
+  ell = TRUE,
+  bic = TRUE,
+  perc_diff = TRUE,
+  relative_risk = TRUE,
+  log_ratio = TRUE,
+  odds_ratio = TRUE,
+  sort = "decreasing",
+  sort_by = "log_likelihood")
+```
+
+Displaying the first 10 rows of results sorted by log likelihood values:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
+
+keyness_measures[1:10,] %>%
+  kbl() %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+Instead, sorting the words by %DIFF measure:
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+keyness_measures_2 <- keyness_measure_calculator(
+  frequency_table,
+  log_likelihood = TRUE,
+  ell = TRUE,
+  bic = TRUE,
+  perc_diff = TRUE,
+  relative_risk = TRUE,
+  log_ratio = TRUE,
+  odds_ratio = TRUE,
+  sort = "decreasing",
+  sort_by = "perc_diff")
+
+keyness_measures_2[1:10,] %>%
+  kbl() %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+

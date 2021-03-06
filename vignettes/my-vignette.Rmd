@@ -1,0 +1,385 @@
+---
+title: "KeynessMeasures: Calculate significance and effect size measures of word keyness"
+author: "Ana Macanović"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Key words and keyness #
+
+<p align='justify'>Used in corpus linguistics, the notion of keyness and keyness analysis is used
+in relation to the **key word defined as "a word which occurs with unusual 
+frequency in a given text [...] by comparison with a reference corpus of some
+kind"** (Scott, 1997). Keyness is often used in research on corpus similarity and
+"aboutness" (the main concepts present in the text) (Gabrielatos, 2018).</p>
+
+## Calculating keyness ##
+
+<p align='justify'>Measures that help locate key words in a corpus by comparing it to another corpus
+are often shared with those exploring collocations (co-occurence of two or more 
+words). Research on corpus linguistics concerned with these topics relies on a
+number of statistical tests. Conventionally, Chi-square or log-likelihood 
+statictics were used (Dunning,1993; Gabrielatos, 2018).</p>
+
+In this framework, the occurence of the word is compared in two corpora:
+
+1. **Target corpus** - the corpus of interest
+1.  **Reference corpus** - the corpus that the target corpus is being compared to. 
+
+
+<p align='justify'>Then, a null hypothesis that there is no difference in the distribution of the occurences of this word in the target and reference corpora. Alternatively,
+there is a difference in the occurence between the corpora.
+The obtained test statistic is then compared to the critical value for the desired
+level of statistical significance and the words above this threshold are
+selected as the key words of the target corpus. </p>
+
+## Statistical significance vs effect size ##
+
+<p align='justify'>Conventionally, corpus linguistics have been relying on Chi-square and log-likelihood.
+However, a body of research has been re-evaluating the use of these measures.</p>
+
+<p align='justify'>While Chi-square/log-likelihood statistics do flag words which occur more 
+frequently in the target corpus compared to the reference corpus, they do not measure the "effect size" - that is, the size of the observed difference in frequencies (Gabrielatos, 2018). This implies that we only have proof to claim that a word 
+occurs with different frequencies in the target corpus compared to the reference
+corpus, but we cannot say anything about the size of this difference. Inquiring
+about the effect size would enable us to also quantify the keyness of the word.</p> 
+
+<p align='justify'>Large inconsistencies between rankings of important words by frequency
+differences and statistical significance measures have been observed (Gabrielatos
+and Marchi, 2011; Gabrielatos, 2018), implying that significance measures might 
+not be effective in highlighting the most characteristic key word differences between the corpora. Moreover, while significance balues are affected by the size of the
+corpora, effect size statistics are not, allowing to compare results against 
+different studies ( Pojanapunya and Watson Todd, 2016).</p>
+
+## Keyness measures: statistical significance and effect size ##
+
+Conventionally used measures testing the significance of the difference of 
+the occurence of a word in one versus another corpus are as follows:
+
+1.  **Log likelihood ratio** - as proposed by Dunning (1983)
+2.  **Chi-squared** - as used in e.g. Aarts (1971) and the **Fisher Exact Test** as
+an altrernative if expected word frequencies are small (Rayson, 2003)
+3.  **Bayesian Information Criterion** - (BIC) an alternative to significance testing
+using p-values, as proposed by Wilson (2013) and implemented by Rayson as per his website (link).
+
+
+Researches on keyness have proposed several effect size measures, such as:
+
+1. **Effect size of Log Likelihood** - calculation of the effect size following 
+the log likelihood measure. Proposed by Johnston et al. (2006), implementation
+for corpus linguistics documented by Rayson as per his website (link).
+2.  **%DIFF** - Percentage difference measures (Gabrielatos and Marchi, 2012; 
+Gabrielatos, 2018)
+3.  **The relative risk** - also known as the Risk Ratio, as proposed by
+Kilgarriff (2009).
+4.  **The Log Ratio Measure** - the binary log of te relative risk, as proposed 
+by Hardie (2014).
+5.  **The Odds ratio** - the ratio of the occurence of the word in one corpus
+relative to its occurence in another corpus, as implemented by Rayson as per his website (link).
+6. **Difference Coefficient** - the ratio of normalised frequencies, as discussed
+by Hofland and Johnasson (1982, cited as per Gabrielatos, 2018).
+
+## Tools for effect size keyness calculation ##
+
+<p align='justify'>Corpus Linguistics relies on a number of tools that assist in Keyness calculation. In R, one can obtain these measures (including Point-wise Mutual Information criterion, PMI) using the **quanteda R package's textstat_keyness function** (link).
+The log ratio measure is implemented in the **CQPWeb corpus analysis system** (link)
+and the remaining effect size measures, together with Log-likelihood and BIC criterion
+are implemented on **Paul Rayson's website** (link). However, there is no R implementation that enables one to easily calculate these measures based on large frequency lists.
+</p>
+<br>
+<br>
+
+# Using KeynessMeasures and interpreting the output #
+
+<p align='justify'>This package was written to provide easy access to these measures in R. It relies on the literature cited above and offers calculation of the log-likelihood and BIC statistical significance measures and Effect size of Log Likelihood, %DIFF, Relative Risk, Log Ratio and the Odds ratio effect size 
+measures.</p>
+
+<p align='justify'>This vignette introduces relevant functions and helps one 
+interpret the results as advised in the literature.</p>
+
+### Downloading and installing ###
+To download the package from GitHub, use the following command within
+the devtools package:
+```{r, eval=F, message=FALSE, warning = FALSE}
+devtools::install_github("amacanovic/KeynessMeasures")
+```
+After the package is compiled and installed, load it:
+```{r, message=FALSE, warning = FALSE}
+library(KeynessMeasures)
+```
+
+### Loading and preprocessing of the file ###
+
+<p align='justify'> Currently, the package works with data.frame input only. Ideally, your corpora
+would be prepared in a .csv or other filetype where the document information and text
+are both stored within a dataframe.</p>
+
+<p align='justify'>As an example here, we will compare Jane Austen's novel "Emma" to her other
+published novels and see which key words we can idenitfy. </p>
+
+To load the data, you need to donwload, install and load the janeaustenr package:
+```{r, eval=F, echo=T}
+install.packages("janeaustenr")
+```
+
+Next, we load the package and obtain all of the novels available in this package 
+(6 novels):
+```{r, message=FALSE, warning = FALSE}
+library(janeaustenr)
+novels <- austen_books()
+```
+If we inspect the file, we can see that this file is a data.frame where each line
+of the text is a new observation and the title of the novel is specified in the
+"book" field
+Below you can see rows 10 to 20 of this file to get an idea:
+```{r, echo=FALSE, message=FALSE, warning = FALSE}
+display <- novels[10:20,]
+library(knitr)
+library(kableExtra)
+kable(head(display, n=10) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=T)
+```
+
+<p align='justify'>We are interested in key words of the novel "Emma" which set it apart from
+other novels of Jane Austen. We can use the "book" field to define our
+corpora of interest. 
+
+In this case, all the rows from "Emma" will be treated
+as our Target corpus, while all the rows from other novels will be treated as
+our Reference corpus.
+
+To do so, we need to obtain a table with frequencies with which each word
+occurs in "Emma" and all the other novels apart from it. This table will then 
+be used as an input for the calculation of keyness measures.</p>
+
+To create the frequency, we use the following function in KeynessMeasures:
+```{r, eval=F}
+frequency_table_creator(
+  df,
+  text_field = NULL,
+  grouping_variable = NULL,
+  grouping_variable_target = NULL,
+  lemmatize = FALSE,
+  remove_punct = FALSE,
+  remove_symbols = FALSE,
+  remove_numbers = FALSE,
+  remove_url = FALSE
+)
+```
+
+<p align='justify'> First, we need to specify which field contains the text of interest `text_field`.
+Then we specify the field that helps determine the target and reference corpora
+(`grouping_variable`). Finally, we specify which value of this field determines
+the target corpus by setting `target` to the appropriate value. In this example,
+we use the `book` field to group, and `Emma` to specify the target corpus.
+All other novels will be assigned to reference corpus.
+
+We can perform simple text pre-processing with this function - lemmatize the text,
+remove punctuation, symbols, numbers and URLs by setting the corresponding
+arguments to `TRUE`.</p>
+
+We will apply the following settings:
+```{r}
+frequency_table <- frequency_table_creator(novels,
+                                           text_field = "text",
+                                           grouping_variable = "book",
+                                           grouping_variable_target = "Emma",
+                                           lemmatize = TRUE,
+                                           remove_punct = TRUE,
+                                           remove_symbols = TRUE,
+                                           remove_numbers = TRUE,
+                                           remove_url = TRUE)
+```
+
+And below are the first rows of the output frequency table - you can see the
+frequency of each word in the target and reference corpora:
+```{r, echo=FALSE, message=FALSE}
+kable(head(frequency_table, n=10) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=T)
+```
+
+
+
+### Calculating and interpreting the measures ###
+
+We will use this frequency table to calculate relevant measures.
+To do this, we use the following function:
+```{r, eval=F}
+keyness_measure_calculator(
+  df,
+  log_likelihood = TRUE,
+  ell = TRUE,
+  bic = TRUE,
+  perc_diff = TRUE,
+  relative_risk = TRUE,
+  log_ratio = TRUE,
+  odds_ratio = TRUE,
+  sort = c("none", "decreasing", "increasing"),
+  sort_by = c("log_likelihood", "perc_diff", "bic", "ell", "relative_risk",
+    "log_ratio", "odds_ratio")
+)
+```
+
+<p align='justify'> Here you see all supported measures. The input is the frequency table obtained
+in the previous step. You can select which measures are calculated by setting
+their respective parameters to `TRUE`. Moreover, you can specify whether
+the table should be automatically sorted, how, and by which measure. </p>
+
+We will go through all the measures in what follows.
+
+Starting with log-likelihood and BIC as statistical significance measures,
+sorting the resulting table by log-likelihood values, from highest to lowest:
+```{r}
+stat_sign_measures <- keyness_measure_calculator(
+  frequency_table,
+  log_likelihood = TRUE,
+  ell = FALSE,
+  bic = TRUE,
+  perc_diff = FALSE,
+  relative_risk = FALSE,
+  log_ratio = FALSE,
+  odds_ratio = FALSE,
+  sort = "decreasing",
+  sort_by = "log_likelihood")
+
+```
+
+And inspecting the top 15 words we can see that the top words mostly denote
+characters and locations in "Emma". Further, words such as "mr" or "thing" also
+seem to be occurring more often in "Emma" compared to other novels.
+
+```{r, echo=FALSE, message=FALSE}
+kable(head(stat_sign_measures, n=15, row.names = NA) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=T)
+```
+Both Log-likelihood and BIC denote our confidence that the difference in
+frequencies of the word is statistically significant between the corpora.
+
+This table presents the appropriate log-likelihood statistic values for
+each confidence level :
+```{r, echo=FALSE, message=FALSE, warning = FALSE}
+library(readr)
+ll_table <- read_csv("LLtable.csv")
+kable(head(ll_table, n=15) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=F)
+```
+
+This table provides a guide for the intepretation of the Bayes Factor scores (as per Gabrielatos, 2018):
+```{r, echo=FALSE, message=FALSE, warning = FALSE}
+bf_table <- read_csv("BFtable.csv")
+kable(head(bf_table, n=15) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=F)
+```
+
+We proceed with the effect size measures, sorting by %DIFF measure:
+```{r}
+effect_size_measures <- keyness_measure_calculator(
+  frequency_table,
+  log_likelihood = FALSE,
+  ell = TRUE,
+  bic = FALSE,
+  perc_diff = TRUE,
+  relative_risk = TRUE,
+  log_ratio = TRUE,
+  odds_ratio = TRUE,
+  sort = "decreasing",
+  sort_by = "perc_diff")
+```
+
+
+Presenting the results:
+```{r, echo=FALSE, message=FALSE}
+kable(head(effect_size_measures, n=15, row.name=NA) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=T)
+```
+
+To understand why effect sizes are important, we will look at the words
+"emma" and "mr" only and combine all the measures:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+all_measures <- keyness_measure_calculator(
+  frequency_table,
+  log_likelihood = TRUE,
+  ell = TRUE,
+  bic = TRUE,
+  perc_diff = TRUE,
+  relative_risk = TRUE,
+  log_ratio = TRUE,
+  odds_ratio = TRUE,
+  sort = "decreasing",
+  sort_by = "perc_diff")
+
+emma_mr <-filter(all_measures, word == "emma"| word =="mr")
+
+
+```
+
+```{r, echo=FALSE, message=FALSE}
+kable(head(emma_mr, n=15) ,"html", booktabs = T) %>%
+  kable_styling(bootstrap_options="striped", full_width=F)
+```
+<p align='justify'>If we would be looking at statistical significance measures, we would be very
+confident that both emma and mr appear more frequently in "Emma" compared
+to other novels. However, they do not tell us anything about how big the difference
+in their appearance is. We can see that all the effect size measures point to
+the fact that the extent to which  "emma" appears more in target corpus compared
+to reference corpus is higher than the extent to which "mr" appears more
+in target corpus compared to the reference corpus. </p>
+
+<p align='justify'>For example, the %DIFF value of 2.75 for "emma" signifies it appears 175% more often
+in the target corpus compared to reference corpus; while "mr" does so 116%
+more. Looking at the relative risk measure, we see "emma" has 2.75 times higher
+"risk" of occurring in the target corpus compared to reference, while "mr"
+has 2.16  times higher "risk" of this kind.</p>
+
+
+### Interpreting the effect size measures ###
+
+Here are more guildelines on the interpretation of these effect-size measures:
+
+1. <p align='justify'> **ELL** - effect size of log likelihood varies between 0 and 1 and represents the proportion of the difference between the observed and expected
+occurences of words (Johnston et al, 2006).</p>
+
+2. <p align='justify'> **%DIFF** - equal frequencies in both corpora are indicated by a value of 0. Positive values denote higher (normalized) frequency in the target corpus; negative values denote lower(normalized) frequency (Gabrielatos, 2018). For example, a value of 61.2 (in the table above for word "any") implies that this word appears 61.2% more often in the target corpus compared to the reference corpus. </p>
+
+3. <p align='justify'> **Relative risk** - Relative risk measures the ratio of words' occurrences in
+the target and reference corpora given the respective corpus sizes. Value of 1 
+implies no difference in frequencies. Larger values imply a word is has a higher "risk" of occurring in the target corpus than in the reference corpus; lower values imply the opposite. If the value is 3, this means that the word has a 3 times higher "risk" of this kind. However, if a word in one of the corpora has a  frequency of 0, this value will go to infinity - since in this function no correction for 0 frequencies for Relative
+Risk has been implemented. </p>
+
+4. <p align='justify'> **Log ratio** - Log ratio is the binary log of the relative risk ratio. This provides more ease of interpretation - every increase point of the log ratio implies the doubling of the ratio of word occurence in target compared to reference corpus (Hardie, 2014). For example, the log ratio of 0, implies the risk ratio of 1 - equal frequencies in two corpora. The log ratio of 1 implies the risk ratio of 2 (frequencies 2 times larger in the target corpus), the log ratio of 2 implies the risk ratio 4, etc. </p>
+
+5. <p align='justify'>**Odds ratio** - Odds Ratio measures the the ratio of words' occurrences in
+the target and reference corpora given the respective corpus sizes minus the frequency
+of the word in question. This distinguishes it from the Relative Risk, although two will return
+similar values when the frequencies in both corpora are low. Odds ratio larger than
+1 indicates higher odds of the word occurring in the target corpus; values lower than
+1 indicate higher odds of the word occurring in the reference corpus.
+</p>
+
+
+## References ##
+
+1.  Aarts, F. G. A. M. (1971). On the distribution of noun-phrase types in English clause structure. Lingua, 26, 281–293.
+2.  Dunning, T. (1993). Accurate methods for the statistics of surprise and coincidence. Computational Linguistics, 19(1), 61–74.
+3.  Gabrielatos, C. (2018). Keyness analysis: Nature, metrics and techniques. In C. Taylor & A. Marchi (Eds.), Corpus Approaches To Discourse: A critical review (pp. 225–258). Oxford: Routledge.
+4.  Gabrielatos, C., & Marchi, A. (2012). Keyness: Appropriate metrics and practical issues. Corpus-Assisted Discourse Studies International Conference.
+5.  Hardie, A. (2014). Log ratio – an informal introduction. Retrieved April 14, 2020, from Post on the website of the ESRC Centre for Corpus Approaches to Social Science CASS. website: http://cass.lancs.ac.uk/?p=1133.
+6.  Johnston, J. E., Berry, K. J., & Mielke, P. W. (2006). Measures of Effect Size for Chi-Squared and Likelihood-Ratio Goodness-of-Fit Tests. Perceptual and Motor Skills, 103(2), 412–414.
+7.  Pojanapunya, P., & Watson Todd, R. (2018). Log-likelihood and odds ratio: Keyness statistics for different purposes of keyword analysis. Corpus Linguistics and Linguistic Theory, 14(1), 133–167.
+8.  Rayson, P. (2003). Matrix: A statistical method and software tool for linguistic analysis through corpus comparison. Lancaster University.
+9.  Rayson, P. (2020). Log-likelihood and effect size calculator. Retrieved April 14, 2020, from http://ucrel.lancs.ac.uk/llwizard.html
+10.  Wilson, A. (2013). Embracing Bayes factors for key item analysis in corpus linguistics. In New approaches to the study of linguistic variability. Language Competence and Language Awareness in Europe (pp. 3–11). Frankfurt: Peter Lang.
+
+

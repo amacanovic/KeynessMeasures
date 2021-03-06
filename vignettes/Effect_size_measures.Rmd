@@ -1,0 +1,115 @@
+---
+title: "KeynessMeasures: Introduction to effect size measures"
+author: "Ana Macanović"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Key words and keyness #
+
+<p align='justify'>Used in corpus linguistics, the notion of keyness and keyness 
+analysis is used in relation to the **key word defined as "a word which occurs 
+with unusual frequency in a given text [...] by comparison with a reference 
+corpus of some kind"** (Scott, 1997). Keyness is often used in research on 
+corpus similarity and "aboutness" (the main concepts present in the text) 
+(Gabrielatos, 2018).</p>
+
+## Calculating keyness ##
+
+<p align='justify'>Measures that help locate key words in a corpus by comparing 
+it to another corpus are often shared with those exploring collocations 
+(co-occurence of two or more words). Research on corpus linguistics concerned 
+with these topics relies on a number of statistical tests. Conventionally, 
+Chi-square or log-likelihood statictics are used (Dunning,1993; Gabrielatos, 2018).</p>
+
+In this framework, the occurence of the word is compared in two corpora:
+
+1. **Target corpus** - the corpus of interest
+1.  **Reference corpus** - the corpus that the target corpus is being compared to. 
+
+<p align='justify'>Then, a null hypothesis that there is no difference in the 
+distribution of the occurrences of this word in the target and reference corpora
+is tested. Alternative hypothesis is stating that there is a difference in the 
+occurrence between the corpora. The obtained test statistic is then compared to 
+the critical value for the desired level of statistical significance and the 
+words above this threshold are selected as the key words of the target corpus.</p>
+
+## Statistical significance vs effect size ##
+
+<p align='justify'>Conventionally, corpus linguistics has been relying on 
+Chi-square and log-likelihood to explore key words in corpora.
+However, a body of research has been re-evaluating the use of these measures
+as the only tool for key word identification.</p>
+
+<p align='justify'>While Chi-square/log-likelihood statistics do flag words
+which occur more frequently in the target corpus compared to the reference 
+corpus, they do not measure the "effect size" - that is, the size of the observed
+difference in frequencies (Gabrielatos, 2018). This implies that we only have 
+proof to claim that a word occurs with (statistically significant) different 
+frequency in the target corpus compared to the reference corpus, but we cannot
+say anything about the size of this difference. Inquiring about the effect size
+would enable us to also quantify the extent of the keyness of the word.
+Not only corpus linguistics, but also research in social sciences could
+benefit of this addition to the keyness exploration. </p> 
+
+<p align='justify'>Large inconsistencies between rankings of important words by 
+frequency differences and statistical significance measures have been observed 
+(Gabrielatos and Marchi, 2011; Gabrielatos, 2018), implying that significance 
+measures might  not be effective in highlighting the most characteristic key 
+word differences between the corpora. Moreover, while significance values are 
+affected by the size of the corpora, effect size statistics are not, 
+allowing to compare results against different studies 
+( Pojanapunya and Watson Todd, 2016).</p>
+
+## Keyness measures: statistical significance and effect size ##
+
+Conventionally used measures testing the significance of the difference of 
+the occurence of a word in one versus another corpus are as follows:
+
+1.  **Log-likelihood Ratio** - as proposed by Dunning (1993)
+2.  **Chi-squared** - as used in e.g. Aarts (1971) and the **Fisher Exact Test** as
+an alternative if expected word frequencies are small (Rayson, 2003)
+
+Additionally, researchers have been proposing use of Bayes Factor as an
+alternative manner of null hypothesis testing, avoiding the limitations of
+p value choices:
+
+3.  **Bayesian Information Criterion** - (BIC) an alternative to 
+significance testing using p-values, as proposed by Wilson (2013).
+
+
+Researchers have proposed several effect size measures which, combined with 
+the statistical significance testing, can improve our understanding of
+keyness:
+
+1. **Effect Size of Log Likelihood** - calculation of the effect size following 
+the log likelihood measure. Proposed by Johnston et al. (2006), implementation
+for corpus linguistics documented by Rayson as per his website (Rayson, 2020);
+2.  **%DIFF** - Percentage difference measure (Gabrielatos and Marchi, 2012; 
+Gabrielatos, 2018);
+3.  **The Relative Risk** - also known as the Risk Ratio, as proposed by
+Kilgarriff (2009);
+4.  **The Log Ratio Measure** - the binary log of te relative risk, as proposed 
+by Hardie (2014);
+5.  **The Odds Ratio** - the ratio of the occurence of the word in one corpus
+relative to its occurence in another corpus, as implemented by Rayson as per his website (Rayson, 2020);
+6. **Difference Coefficient** - the ratio of normalised frequencies, as discussed
+by Hofland and Johnasson (1982, cited as per Gabrielatos, 2018);
+
+KeynessMeasures package provides a function that calculates these measures.
+
+## References ##
+
+1.  Aarts, F. G. A. M. (1971). On the distribution of noun-phrase types in English clause structure. Lingua, 26, 281–293.
+2.  Dunning, T. (1993). Accurate methods for the statistics of surprise and coincidence. Computational Linguistics, 19(1), 61–74.
+3.  Gabrielatos, C. (2018). Keyness analysis: Nature, metrics and techniques. In C. Taylor & A. Marchi (Eds.), Corpus Approaches To Discourse: A critical review (pp. 225–258). Oxford: Routledge.
+4.  Gabrielatos, C., & Marchi, A. (2012). Keyness: Appropriate metrics and practical issues. Corpus-Assisted Discourse Studies International Conference.
+5.  Hardie, A. (2014). Log ratio – an informal introduction. Retrieved April 14, 2020, from Post on the website of the ESRC Centre for Corpus Approaches to Social Science CASS. website: http://cass.lancs.ac.uk/?p=1133.
+6.  Johnston, J. E., Berry, K. J., & Mielke, P. W. (2006). Measures of Effect Size for Chi-Squared and Likelihood-Ratio Goodness-of-Fit Tests. Perceptual and Motor Skills, 103(2), 412–414.
+7.  Pojanapunya, P., & Watson Todd, R. (2018). Log-likelihood and odds ratio: Keyness statistics for different purposes of keyword analysis. Corpus Linguistics and Linguistic Theory, 14(1), 133–167.
+8.  Rayson, P. (2003). Matrix: A statistical method and software tool for linguistic analysis through corpus comparison. Lancaster University.
+9.  Rayson, P. (2020). Log-likelihood and effect size calculator. Retrieved April 14, 2020, from http://ucrel.lancs.ac.uk/llwizard.html
+10.  Wilson, A. (2013). Embracing Bayes factors for key item analysis in corpus linguistics. In New approaches to the study of linguistic variability. Language Competence and Language Awareness in Europe (pp. 3–11). Frankfurt: Peter Lang.
