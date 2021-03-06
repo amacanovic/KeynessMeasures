@@ -1,7 +1,5 @@
----
-title: "KeynessMeasures"
-output: github_document
----
+
+## KeynessMasures
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
