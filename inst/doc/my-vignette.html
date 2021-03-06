@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ana Macanović" />
+
+
+<title>KeynessMeasures: Calculate significance and effect size measures of word keyness</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+<script>$(document).ready(function(){
+    if (typeof $('[data-toggle="tooltip"]').tooltip === 'function') {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+    if ($('[data-toggle="popover"]').popover === 'function') {
+        $('[data-toggle="popover"]').popover();
+    }
+});
+</script>
+<style type="text/css">
+.lightable-minimal {
+border-collapse: separate;
+border-spacing: 16px 1px;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-minimal td {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal th {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal thead tr:last-child th {
+border-bottom: 2px solid #00000050;
+empty-cells: hide;
+}
+.lightable-minimal tbody tr:first-child td {
+padding-top: 0.5em;
+}
+.lightable-minimal.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-minimal.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic {
+border-top: 0.16em solid #111111;
+border-bottom: 0.16em solid #111111;
+width: 100%;
+margin-bottom: 10px;
+margin: 10px 5px;
+}
+.lightable-classic tfoot tr td {
+border: 0;
+}
+.lightable-classic tfoot tr:first-child td {
+border-top: 0.14em solid #111111;
+}
+.lightable-classic caption {
+color: #222222;
+}
+.lightable-classic td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic thead tr:last-child th {
+border-bottom: 0.10em solid #111111;
+}
+.lightable-classic.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic-2 {
+border-top: 3px double #111111;
+border-bottom: 3px double #111111;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-classic-2 tfoot tr td {
+border: 0;
+}
+.lightable-classic-2 tfoot tr:first-child td {
+border-top: 3px double #111111;
+}
+.lightable-classic-2 caption {
+color: #222222;
+}
+.lightable-classic-2 td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic-2 th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic-2 tbody tr:last-child td {
+border-bottom: 3px double #111111;
+}
+.lightable-classic-2 thead tr:last-child th {
+border-bottom: 1px solid #111111;
+}
+.lightable-classic-2.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic-2.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #EEE;
+border-collapse: collapse;
+margin-bottom: 10px;
+}
+.lightable-material tfoot tr td {
+border: 0;
+}
+.lightable-material tfoot tr:first-child td {
+border-top: 1px solid #EEE;
+}
+.lightable-material th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+}
+.lightable-material td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+border-top: 1px solid #eeeeee;
+}
+.lightable-material.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #ddd;
+}
+.lightable-material-dark {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #FFFFFF12;
+border-collapse: collapse;
+margin-bottom: 10px;
+background-color: #363640;
+}
+.lightable-material-dark tfoot tr td {
+border: 0;
+}
+.lightable-material-dark tfoot tr:first-child td {
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF60;
+}
+.lightable-material-dark td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF;
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark.lightable-hover tbody tr:hover {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody tr:nth-child(even) {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material-dark.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #FFFFFF12;
+}
+.lightable-paper {
+width: 100%;
+margin-bottom: 10px;
+color: #444;
+}
+.lightable-paper tfoot tr td {
+border: 0;
+}
+.lightable-paper tfoot tr:first-child td {
+border-top: 1px solid #00000020;
+}
+.lightable-paper thead tr:last-child th {
+color: #666;
+vertical-align: bottom;
+border-bottom: 1px solid #00000020;
+line-height: 1.15em;
+padding: 10px 5px;
+}
+.lightable-paper td {
+vertical-align: middle;
+border-bottom: 1px solid #00000010;
+line-height: 1.15em;
+padding: 7px 5px;
+}
+.lightable-paper.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-paper.lightable-striped tbody tr:nth-child(even) {
+background-color: #00000008;
+}
+.lightable-paper.lightable-striped tbody td {
+border: 0;
+}
+</style>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">KeynessMeasures: Calculate significance and effect size measures of word keyness</h1>
+<h4 class="author">Ana Macanović</h4>
+
+
+
+<div id="key-words-and-keyness" class="section level1">
+<h1>Key words and keyness</h1>
+<p align="justify">
+Used in corpus linguistics, the notion of keyness and keyness analysis is used in relation to the <strong>key word defined as “a word which occurs with unusual frequency in a given text […] by comparison with a reference corpus of some kind”</strong> (Scott, 1997). Keyness is often used in research on corpus similarity and “aboutness” (the main concepts present in the text) (Gabrielatos, 2018).
+</p>
+<div id="calculating-keyness" class="section level2">
+<h2>Calculating keyness</h2>
+<p align="justify">
+Measures that help locate key words in a corpus by comparing it to another corpus are often shared with those exploring collocations (co-occurence of two or more words). Research on corpus linguistics concerned with these topics relies on a number of statistical tests. Conventionally, Chi-square or log-likelihood statictics were used (Dunning,1993; Gabrielatos, 2018).
+</p>
+<p>In this framework, the occurence of the word is compared in two corpora:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Target corpus</strong> - the corpus of interest</li>
+<li><strong>Reference corpus</strong> - the corpus that the target corpus is being compared to.</li>
+</ol>
+<p align="justify">
+Then, a null hypothesis that there is no difference in the distribution of the occurences of this word in the target and reference corpora. Alternatively, there is a difference in the occurence between the corpora. The obtained test statistic is then compared to the critical value for the desired level of statistical significance and the words above this threshold are selected as the key words of the target corpus.
+</p>
+</div>
+<div id="statistical-significance-vs-effect-size" class="section level2">
+<h2>Statistical significance vs effect size</h2>
+<p align="justify">
+Conventionally, corpus linguistics have been relying on Chi-square and log-likelihood. However, a body of research has been re-evaluating the use of these measures.
+</p>
+<p align="justify">
+While Chi-square/log-likelihood statistics do flag words which occur more frequently in the target corpus compared to the reference corpus, they do not measure the “effect size” - that is, the size of the observed difference in frequencies (Gabrielatos, 2018). This implies that we only have proof to claim that a word occurs with different frequencies in the target corpus compared to the reference corpus, but we cannot say anything about the size of this difference. Inquiring about the effect size would enable us to also quantify the keyness of the word.
+</p>
+<p align="justify">
+Large inconsistencies between rankings of important words by frequency differences and statistical significance measures have been observed (Gabrielatos and Marchi, 2011; Gabrielatos, 2018), implying that significance measures might not be effective in highlighting the most characteristic key word differences between the corpora. Moreover, while significance balues are affected by the size of the corpora, effect size statistics are not, allowing to compare results against different studies ( Pojanapunya and Watson Todd, 2016).
+</p>
+</div>
+<div id="keyness-measures-statistical-significance-and-effect-size" class="section level2">
+<h2>Keyness measures: statistical significance and effect size</h2>
+<p>Conventionally used measures testing the significance of the difference of the occurence of a word in one versus another corpus are as follows:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Log likelihood ratio</strong> - as proposed by Dunning (1983)</li>
+<li><strong>Chi-squared</strong> - as used in e.g. Aarts (1971) and the <strong>Fisher Exact Test</strong> as an altrernative if expected word frequencies are small (Rayson, 2003)</li>
+<li><strong>Bayesian Information Criterion</strong> - (BIC) an alternative to significance testing using p-values, as proposed by Wilson (2013) and implemented by Rayson as per his website (link).</li>
+</ol>
+<p>Researches on keyness have proposed several effect size measures, such as:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Effect size of Log Likelihood</strong> - calculation of the effect size following the log likelihood measure. Proposed by Johnston et al. (2006), implementation for corpus linguistics documented by Rayson as per his website (link).</li>
+<li><strong>%DIFF</strong> - Percentage difference measures (Gabrielatos and Marchi, 2012; Gabrielatos, 2018)</li>
+<li><strong>The relative risk</strong> - also known as the Risk Ratio, as proposed by Kilgarriff (2009).</li>
+<li><strong>The Log Ratio Measure</strong> - the binary log of te relative risk, as proposed by Hardie (2014).</li>
+<li><strong>The Odds ratio</strong> - the ratio of the occurence of the word in one corpus relative to its occurence in another corpus, as implemented by Rayson as per his website (link).</li>
+<li><strong>Difference Coefficient</strong> - the ratio of normalised frequencies, as discussed by Hofland and Johnasson (1982, cited as per Gabrielatos, 2018).</li>
+</ol>
+</div>
+<div id="tools-for-effect-size-keyness-calculation" class="section level2">
+<h2>Tools for effect size keyness calculation</h2>
+<p align="justify">
+Corpus Linguistics relies on a number of tools that assist in Keyness calculation. In R, one can obtain these measures (including Point-wise Mutual Information criterion, PMI) using the <strong>quanteda R package’s textstat_keyness function</strong> (link). The log ratio measure is implemented in the <strong>CQPWeb corpus analysis system</strong> (link) and the remaining effect size measures, together with Log-likelihood and BIC criterion are implemented on <strong>Paul Rayson’s website</strong> (link). However, there is no R implementation that enables one to easily calculate these measures based on large frequency lists.
+</p>
+<p><br> <br></p>
+</div>
+</div>
+<div id="using-keynessmeasures-and-interpreting-the-output" class="section level1">
+<h1>Using KeynessMeasures and interpreting the output</h1>
+<p align="justify">
+This package was written to provide easy access to these measures in R. It relies on the literature cited above and offers calculation of the log-likelihood and BIC statistical significance measures and Effect size of Log Likelihood, %DIFF, Relative Risk, Log Ratio and the Odds ratio effect size measures.
+</p>
+<p align="justify">
+This vignette introduces relevant functions and helps one interpret the results as advised in the literature.
+</p>
+<div id="downloading-and-installing" class="section level3">
+<h3>Downloading and installing</h3>
+<p>To download the package from GitHub, use the following command within the devtools package:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;amacanovic/KeynessMeasures&quot;</span>)</span></code></pre></div>
+<p>After the package is compiled and installed, load it:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(KeynessMeasures)</span></code></pre></div>
+</div>
+<div id="loading-and-preprocessing-of-the-file" class="section level3">
+<h3>Loading and preprocessing of the file</h3>
+<p align="justify">
+Currently, the package works with data.frame input only. Ideally, your corpora would be prepared in a .csv or other filetype where the document information and text are both stored within a dataframe.
+</p>
+<p align="justify">
+As an example here, we will compare Jane Austen’s novel “Emma” to her other published novels and see which key words we can idenitfy.
+</p>
+<p>To load the data, you need to donwload, install and load the janeaustenr package:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;janeaustenr&quot;</span>)</span></code></pre></div>
+<p>Next, we load the package and obtain all of the novels available in this package (6 novels):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">library</span>(janeaustenr)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>novels &lt;-<span class="st"> </span><span class="kw">austen_books</span>()</span></code></pre></div>
+If we inspect the file, we can see that this file is a data.frame where each line of the text is a new observation and the title of the novel is specified in the “book” field Below you can see rows 10 to 20 of this file to get an idea:
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+text
+</th>
+<th style="text-align:left;">
+book
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+CHAPTER 1
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+13
+</td>
+<td style="text-align:left;">
+The family of Dashwood had long been settled in Sussex. Their estate
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+14
+</td>
+<td style="text-align:left;">
+was large, and their residence was at Norland Park, in the centre of
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:left;">
+their property, where, for many generations, they had lived in so
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+16
+</td>
+<td style="text-align:left;">
+respectable a manner as to engage the general good opinion of their
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+surrounding acquaintance. The late owner of this estate was a single
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+18
+</td>
+<td style="text-align:left;">
+man, who lived to a very advanced age, and who for many years of his
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+19
+</td>
+<td style="text-align:left;">
+life, had a constant companion and housekeeper in his sister. But her
+</td>
+<td style="text-align:left;">
+Sense &amp; Sensibility
+</td>
+</tr>
+</tbody>
+</table>
+<p align="justify">
+<p>We are interested in key words of the novel “Emma” which set it apart from other novels of Jane Austen. We can use the “book” field to define our corpora of interest.</p>
+<p>In this case, all the rows from “Emma” will be treated as our Target corpus, while all the rows from other novels will be treated as our Reference corpus.</p>
+To do so, we need to obtain a table with frequencies with which each word occurs in “Emma” and all the other novels apart from it. This table will then be used as an input for the calculation of keyness measures.
+</p>
+<p>To create the frequency, we use the following function in KeynessMeasures:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">frequency_table_creator</span>(</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  df,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="dt">text_field =</span> <span class="ot">NULL</span>,</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="dt">grouping_variable =</span> <span class="ot">NULL</span>,</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="dt">grouping_variable_target =</span> <span class="ot">NULL</span>,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="dt">lemmatize =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb5-7"><a href="#cb5-7"></a>  <span class="dt">remove_punct =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>  <span class="dt">remove_symbols =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  <span class="dt">remove_numbers =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  <span class="dt">remove_url =</span> <span class="ot">FALSE</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a>)</span></code></pre></div>
+<p align="justify">
+<p>First, we need to specify which field contains the text of interest <code>text_field</code>. Then we specify the field that helps determine the target and reference corpora (<code>grouping_variable</code>). Finally, we specify which value of this field determines the target corpus by setting <code>target</code> to the appropriate value. In this example, we use the <code>book</code> field to group, and <code>Emma</code> to specify the target corpus. All other novels will be assigned to reference corpus.</p>
+We can perform simple text pre-processing with this function - lemmatize the text, remove punctuation, symbols, numbers and URLs by setting the corresponding arguments to <code>TRUE</code>.
+</p>
+<p>We will apply the following settings:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>frequency_table &lt;-<span class="st"> </span><span class="kw">frequency_table_creator</span>(novels,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>                                           <span class="dt">text_field =</span> <span class="st">&quot;text&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>                                           <span class="dt">grouping_variable =</span> <span class="st">&quot;book&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4"></a>                                           <span class="dt">grouping_variable_target =</span> <span class="st">&quot;Emma&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5"></a>                                           <span class="dt">lemmatize =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb6-6"><a href="#cb6-6"></a>                                           <span class="dt">remove_punct =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb6-7"><a href="#cb6-7"></a>                                           <span class="dt">remove_symbols =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb6-8"><a href="#cb6-8"></a>                                           <span class="dt">remove_numbers =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb6-9"><a href="#cb6-9"></a>                                           <span class="dt">remove_url =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+And below are the first rows of the output frequency table - you can see the frequency of each word in the target and reference corpora:
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+word
+</th>
+<th style="text-align:right;">
+target
+</th>
+<th style="text-align:right;">
+reference
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+sense
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+163
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+and
+</td>
+<td style="text-align:right;">
+4897
+</td>
+<td style="text-align:right;">
+17620
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sensibility
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+by
+</td>
+<td style="text-align:right;">
+571
+</td>
+<td style="text-align:right;">
+2974
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+jane
+</td>
+<td style="text-align:right;">
+282
+</td>
+<td style="text-align:right;">
+268
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+austen
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+chapter
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+217
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+the
+</td>
+<td style="text-align:right;">
+5204
+</td>
+<td style="text-align:right;">
+21153
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+family
+</td>
+<td style="text-align:right;">
+88
+</td>
+<td style="text-align:right;">
+538
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+of
+</td>
+<td style="text-align:right;">
+4293
+</td>
+<td style="text-align:right;">
+16888
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="calculating-and-interpreting-the-measures" class="section level3">
+<h3>Calculating and interpreting the measures</h3>
+<p>We will use this frequency table to calculate relevant measures. To do this, we use the following function:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">keyness_measure_calculator</span>(</span>
+<span id="cb7-2"><a href="#cb7-2"></a>  df,</span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="dt">log_likelihood =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="dt">ell =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="dt">bic =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="dt">perc_diff =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-7"><a href="#cb7-7"></a>  <span class="dt">relative_risk =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-8"><a href="#cb7-8"></a>  <span class="dt">log_ratio =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-9"><a href="#cb7-9"></a>  <span class="dt">odds_ratio =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb7-10"><a href="#cb7-10"></a>  <span class="dt">sort =</span> <span class="kw">c</span>(<span class="st">&quot;none&quot;</span>, <span class="st">&quot;decreasing&quot;</span>, <span class="st">&quot;increasing&quot;</span>),</span>
+<span id="cb7-11"><a href="#cb7-11"></a>  <span class="dt">sort_by =</span> <span class="kw">c</span>(<span class="st">&quot;log_likelihood&quot;</span>, <span class="st">&quot;perc_diff&quot;</span>, <span class="st">&quot;bic&quot;</span>, <span class="st">&quot;ell&quot;</span>, <span class="st">&quot;relative_risk&quot;</span>,</span>
+<span id="cb7-12"><a href="#cb7-12"></a>    <span class="st">&quot;log_ratio&quot;</span>, <span class="st">&quot;odds_ratio&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13"></a>)</span></code></pre></div>
+<p align="justify">
+Here you see all supported measures. The input is the frequency table obtained in the previous step. You can select which measures are calculated by setting their respective parameters to <code>TRUE</code>. Moreover, you can specify whether the table should be automatically sorted, how, and by which measure.
+</p>
+<p>We will go through all the measures in what follows.</p>
+<p>Starting with log-likelihood and BIC as statistical significance measures, sorting the resulting table by log-likelihood values, from highest to lowest:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>stat_sign_measures &lt;-<span class="st"> </span><span class="kw">keyness_measure_calculator</span>(</span>
+<span id="cb8-2"><a href="#cb8-2"></a>  frequency_table,</span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="dt">log_likelihood =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="dt">ell =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb8-5"><a href="#cb8-5"></a>  <span class="dt">bic =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb8-6"><a href="#cb8-6"></a>  <span class="dt">perc_diff =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb8-7"><a href="#cb8-7"></a>  <span class="dt">relative_risk =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb8-8"><a href="#cb8-8"></a>  <span class="dt">log_ratio =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb8-9"><a href="#cb8-9"></a>  <span class="dt">odds_ratio =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb8-10"><a href="#cb8-10"></a>  <span class="dt">sort =</span> <span class="st">&quot;decreasing&quot;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11"></a>  <span class="dt">sort_by =</span> <span class="st">&quot;log_likelihood&quot;</span>)</span></code></pre></div>
+<p>And inspecting the top 15 words we can see that the top words mostly denote characters and locations in “Emma”. Further, words such as “mr” or “thing” also seem to be occurring more often in “Emma” compared to other novels.</p>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+word
+</th>
+<th style="text-align:right;">
+freq_target_corpus
+</th>
+<th style="text-align:right;">
+freq_reference_corpus
+</th>
+<th style="text-align:left;">
+word_use
+</th>
+<th style="text-align:right;">
+log_likelihood
+</th>
+<th style="text-align:right;">
+bic
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+7594
+</td>
+<td style="text-align:left;">
+emma
+</td>
+<td style="text-align:right;">
+786
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+2350.3189
+</td>
+<td style="text-align:right;">
+2336.8255
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5442
+</td>
+<td style="text-align:left;">
+harriet
+</td>
+<td style="text-align:right;">
+415
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+1205.6112
+</td>
+<td style="text-align:right;">
+1192.1178
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7601
+</td>
+<td style="text-align:left;">
+weston
+</td>
+<td style="text-align:right;">
+389
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+1170.5395
+</td>
+<td style="text-align:right;">
+1157.0461
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7613
+</td>
+<td style="text-align:left;">
+knightley
+</td>
+<td style="text-align:right;">
+356
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+1071.2392
+</td>
+<td style="text-align:right;">
+1057.7458
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7622
+</td>
+<td style="text-align:left;">
+elton
+</td>
+<td style="text-align:right;">
+320
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+962.9117
+</td>
+<td style="text-align:right;">
+949.4183
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7595
+</td>
+<td style="text-align:left;">
+woodhouse
+</td>
+<td style="text-align:right;">
+278
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+836.5295
+</td>
+<td style="text-align:right;">
+823.0361
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7794
+</td>
+<td style="text-align:left;">
+fairfax
+</td>
+<td style="text-align:right;">
+210
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+631.9108
+</td>
+<td style="text-align:right;">
+618.4174
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7625
+</td>
+<td style="text-align:left;">
+churchill
+</td>
+<td style="text-align:right;">
+193
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+580.7561
+</td>
+<td style="text-align:right;">
+567.2627
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1727
+</td>
+<td style="text-align:left;">
+frank
+</td>
+<td style="text-align:right;">
+200
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+532.1223
+</td>
+<td style="text-align:right;">
+518.6289
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7605
+</td>
+<td style="text-align:left;">
+hartfield
+</td>
+<td style="text-align:right;">
+159
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+478.4467
+</td>
+<td style="text-align:right;">
+464.9533
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+81
+</td>
+<td style="text-align:left;">
+mr
+</td>
+<td style="text-align:right;">
+1154
+</td>
+<td style="text-align:right;">
+1864
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+393.6683
+</td>
+<td style="text-align:right;">
+380.1749
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7635
+</td>
+<td style="text-align:left;">
+bate
+</td>
+<td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+379.1465
+</td>
+<td style="text-align:right;">
+365.6531
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7607
+</td>
+<td style="text-align:left;">
+highbury
+</td>
+<td style="text-align:right;">
+125
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+376.1374
+</td>
+<td style="text-align:right;">
+362.6440
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7684
+</td>
+<td style="text-align:left;">
+harriet’s
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+273.8280
+</td>
+<td style="text-align:right;">
+260.3346
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+278
+</td>
+<td style="text-align:left;">
+thing
+</td>
+<td style="text-align:right;">
+460
+</td>
+<td style="text-align:right;">
+544
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+272.6655
+</td>
+<td style="text-align:right;">
+259.1721
+</td>
+</tr>
+</tbody>
+</table>
+<p>Both Log-likelihood and BIC denote our confidence that the difference in frequencies of the word is statistically significant between the corpora.</p>
+This table presents the appropriate log-likelihood statistic values for each confidence level :
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+Critical value
+</th>
+<th style="text-align:left;">
+p value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+3.84
+</td>
+<td style="text-align:left;">
+p &lt; 0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6.63
+</td>
+<td style="text-align:left;">
+p &lt; 0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10.83
+</td>
+<td style="text-align:left;">
+p &lt; 0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+15.13
+</td>
+<td style="text-align:left;">
+p &lt; 0.0001
+</td>
+</tr>
+</tbody>
+</table>
+This table provides a guide for the intepretation of the Bayes Factor scores (as per Gabrielatos, 2018):
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+BIC value
+</th>
+<th style="text-align:left;">
+interpretation
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+0-2
+</td>
+<td style="text-align:left;">
+no evidence against H0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2-6
+</td>
+<td style="text-align:left;">
+positive evidence against H0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6-10
+</td>
+<td style="text-align:left;">
+strong evidence against H0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+&gt; 10
+</td>
+<td style="text-align:left;">
+very strong evidence against H0
+</td>
+</tr>
+</tbody>
+</table>
+<p>We proceed with the effect size measures, sorting by %DIFF measure:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>effect_size_measures &lt;-<span class="st"> </span><span class="kw">keyness_measure_calculator</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  frequency_table,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="dt">log_likelihood =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="dt">ell =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="dt">bic =</span> <span class="ot">FALSE</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="dt">perc_diff =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-7"><a href="#cb9-7"></a>  <span class="dt">relative_risk =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-8"><a href="#cb9-8"></a>  <span class="dt">log_ratio =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="dt">odds_ratio =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-10"><a href="#cb9-10"></a>  <span class="dt">sort =</span> <span class="st">&quot;decreasing&quot;</span>,</span>
+<span id="cb9-11"><a href="#cb9-11"></a>  <span class="dt">sort_by =</span> <span class="st">&quot;perc_diff&quot;</span>)</span></code></pre></div>
+Presenting the results:
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+word
+</th>
+<th style="text-align:right;">
+freq_target_corpus
+</th>
+<th style="text-align:right;">
+freq_reference_corpus
+</th>
+<th style="text-align:left;">
+word_use
+</th>
+<th style="text-align:right;">
+ell
+</th>
+<th style="text-align:right;">
+perc_diff
+</th>
+<th style="text-align:right;">
+relative_risk
+</th>
+<th style="text-align:right;">
+log_ratio
+</th>
+<th style="text-align:right;">
+odds_ratio
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+7601
+</td>
+<td style="text-align:left;">
+weston
+</td>
+<td style="text-align:right;">
+389
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0003623
+</td>
+<td style="text-align:right;">
+2.416870e+17
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+11.411857
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7613
+</td>
+<td style="text-align:left;">
+knightley
+</td>
+<td style="text-align:right;">
+356
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0003383
+</td>
+<td style="text-align:right;">
+2.211840e+17
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+11.283964
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7622
+</td>
+<td style="text-align:left;">
+elton
+</td>
+<td style="text-align:right;">
+320
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0003117
+</td>
+<td style="text-align:right;">
+1.988170e+17
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+11.130159
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7595
+</td>
+<td style="text-align:left;">
+woodhouse
+</td>
+<td style="text-align:right;">
+278
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0002800
+</td>
+<td style="text-align:right;">
+1.727223e+17
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+10.927172
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7794
+</td>
+<td style="text-align:left;">
+fairfax
+</td>
+<td style="text-align:right;">
+210
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0002269
+</td>
+<td style="text-align:right;">
+1.304737e+17
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+10.522476
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7625
+</td>
+<td style="text-align:left;">
+churchill
+</td>
+<td style="text-align:right;">
+193
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0002133
+</td>
+<td style="text-align:right;">
+1.199115e+17
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+10.400688
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7605
+</td>
+<td style="text-align:left;">
+hartfield
+</td>
+<td style="text-align:right;">
+159
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001852
+</td>
+<td style="text-align:right;">
+9.878722e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+10.121113
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7635
+</td>
+<td style="text-align:left;">
+bate
+</td>
+<td style="text-align:right;">
+126
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001570
+</td>
+<td style="text-align:right;">
+7.828421e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.785510
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7607
+</td>
+<td style="text-align:left;">
+highbury
+</td>
+<td style="text-align:right;">
+125
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001562
+</td>
+<td style="text-align:right;">
+7.766291e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.774015
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7684
+</td>
+<td style="text-align:left;">
+harriet’s
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001257
+</td>
+<td style="text-align:right;">
+5.653860e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.316025
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7610
+</td>
+<td style="text-align:left;">
+randalls
+</td>
+<td style="text-align:right;">
+90
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001248
+</td>
+<td style="text-align:right;">
+5.591729e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.300084
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7651
+</td>
+<td style="text-align:left;">
+martin
+</td>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001201
+</td>
+<td style="text-align:right;">
+5.281078e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.217621
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7598
+</td>
+<td style="text-align:left;">
+emma’s
+</td>
+<td style="text-align:right;">
+79
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001145
+</td>
+<td style="text-align:right;">
+4.908296e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.112011
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7634
+</td>
+<td style="text-align:left;">
+perry
+</td>
+<td style="text-align:right;">
+74
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001098
+</td>
+<td style="text-align:right;">
+4.597644e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+9.017684
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7627
+</td>
+<td style="text-align:left;">
+surprize
+</td>
+<td style="text-align:right;">
+71
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+0.0001069
+</td>
+<td style="text-align:right;">
+4.411253e+16
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+<td style="text-align:right;">
+8.957978
+</td>
+<td style="text-align:right;">
+Inf
+</td>
+</tr>
+</tbody>
+</table>
+<p>To understand why effect sizes are important, we will look at the words “emma” and “mr” only and combine all the measures:</p>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+word
+</th>
+<th style="text-align:right;">
+freq_target_corpus
+</th>
+<th style="text-align:right;">
+freq_reference_corpus
+</th>
+<th style="text-align:left;">
+word_use
+</th>
+<th style="text-align:right;">
+log_likelihood
+</th>
+<th style="text-align:right;">
+ell
+</th>
+<th style="text-align:right;">
+bic
+</th>
+<th style="text-align:right;">
+perc_diff
+</th>
+<th style="text-align:right;">
+relative_risk
+</th>
+<th style="text-align:right;">
+log_ratio
+</th>
+<th style="text-align:right;">
+odds_ratio
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+emma
+</td>
+<td style="text-align:right;">
+786
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+2350.3189
+</td>
+<td style="text-align:right;">
+0.0006281
+</td>
+<td style="text-align:right;">
+2336.8255
+</td>
+<td style="text-align:right;">
+275167.0138
+</td>
+<td style="text-align:right;">
+2752.670138
+</td>
+<td style="text-align:right;">
+11.426616
+</td>
+<td style="text-align:right;">
+2766.173707
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mr
+</td>
+<td style="text-align:right;">
+1154
+</td>
+<td style="text-align:right;">
+1864
+</td>
+<td style="text-align:left;">
+overuse
+</td>
+<td style="text-align:right;">
+393.6683
+</td>
+<td style="text-align:right;">
+0.0000835
+</td>
+<td style="text-align:right;">
+380.1749
+</td>
+<td style="text-align:right;">
+116.8161
+</td>
+<td style="text-align:right;">
+2.168161
+</td>
+<td style="text-align:right;">
+1.116472
+</td>
+<td style="text-align:right;">
+2.176597
+</td>
+</tr>
+</tbody>
+</table>
+<p align="justify">
+If we would be looking at statistical significance measures, we would be very confident that both emma and mr appear more frequently in “Emma” compared to other novels. However, they do not tell us anything about how big the difference in their appearance is. We can see that all the effect size measures point to the fact that the extent to which “emma” appears more in target corpus compared to reference corpus is higher than the extent to which “mr” appears more in target corpus compared to the reference corpus.
+</p>
+<p align="justify">
+For example, the %DIFF value of 2.75 for “emma” signifies it appears 175% more often in the target corpus compared to reference corpus; while “mr” does so 116% more. Looking at the relative risk measure, we see “emma” has 2.75 times higher “risk” of occurring in the target corpus compared to reference, while “mr” has 2.16 times higher “risk” of this kind.
+</p>
+</div>
+<div id="interpreting-the-effect-size-measures" class="section level3">
+<h3>Interpreting the effect size measures</h3>
+<p>Here are more guildelines on the interpretation of these effect-size measures:</p>
+<ol style="list-style-type: decimal">
+<li><p align="justify">
+<strong>ELL</strong> - effect size of log likelihood varies between 0 and 1 and represents the proportion of the difference between the observed and expected occurences of words (Johnston et al, 2006).
+</p></li>
+<li><p align="justify">
+<strong>%DIFF</strong> - equal frequencies in both corpora are indicated by a value of 0. Positive values denote higher (normalized) frequency in the target corpus; negative values denote lower(normalized) frequency (Gabrielatos, 2018). For example, a value of 61.2 (in the table above for word “any”) implies that this word appears 61.2% more often in the target corpus compared to the reference corpus.
+</p></li>
+<li><p align="justify">
+<strong>Relative risk</strong> - Relative risk measures the ratio of words’ occurrences in the target and reference corpora given the respective corpus sizes. Value of 1 implies no difference in frequencies. Larger values imply a word is has a higher “risk” of occurring in the target corpus than in the reference corpus; lower values imply the opposite. If the value is 3, this means that the word has a 3 times higher “risk” of this kind. However, if a word in one of the corpora has a frequency of 0, this value will go to infinity - since in this function no correction for 0 frequencies for Relative Risk has been implemented.
+</p></li>
+<li><p align="justify">
+<strong>Log ratio</strong> - Log ratio is the binary log of the relative risk ratio. This provides more ease of interpretation - every increase point of the log ratio implies the doubling of the ratio of word occurence in target compared to reference corpus (Hardie, 2014). For example, the log ratio of 0, implies the risk ratio of 1 - equal frequencies in two corpora. The log ratio of 1 implies the risk ratio of 2 (frequencies 2 times larger in the target corpus), the log ratio of 2 implies the risk ratio 4, etc.
+</p></li>
+<li><p align="justify">
+<strong>Odds ratio</strong> - Odds Ratio measures the the ratio of words’ occurrences in the target and reference corpora given the respective corpus sizes minus the frequency of the word in question. This distinguishes it from the Relative Risk, although two will return similar values when the frequencies in both corpora are low. Odds ratio larger than 1 indicates higher odds of the word occurring in the target corpus; values lower than 1 indicate higher odds of the word occurring in the reference corpus.
+</p></li>
+</ol>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ol style="list-style-type: decimal">
+<li>Aarts, F. G. A. M. (1971). On the distribution of noun-phrase types in English clause structure. Lingua, 26, 281–293.</li>
+<li>Dunning, T. (1993). Accurate methods for the statistics of surprise and coincidence. Computational Linguistics, 19(1), 61–74.</li>
+<li>Gabrielatos, C. (2018). Keyness analysis: Nature, metrics and techniques. In C. Taylor &amp; A. Marchi (Eds.), Corpus Approaches To Discourse: A critical review (pp. 225–258). Oxford: Routledge.</li>
+<li>Gabrielatos, C., &amp; Marchi, A. (2012). Keyness: Appropriate metrics and practical issues. Corpus-Assisted Discourse Studies International Conference.</li>
+<li>Hardie, A. (2014). Log ratio – an informal introduction. Retrieved April 14, 2020, from Post on the website of the ESRC Centre for Corpus Approaches to Social Science CASS. website: <a href="http://cass.lancs.ac.uk/?p=1133" class="uri">http://cass.lancs.ac.uk/?p=1133</a>.</li>
+<li>Johnston, J. E., Berry, K. J., &amp; Mielke, P. W. (2006). Measures of Effect Size for Chi-Squared and Likelihood-Ratio Goodness-of-Fit Tests. Perceptual and Motor Skills, 103(2), 412–414.</li>
+<li>Pojanapunya, P., &amp; Watson Todd, R. (2018). Log-likelihood and odds ratio: Keyness statistics for different purposes of keyword analysis. Corpus Linguistics and Linguistic Theory, 14(1), 133–167.</li>
+<li>Rayson, P. (2003). Matrix: A statistical method and software tool for linguistic analysis through corpus comparison. Lancaster University.</li>
+<li>Rayson, P. (2020). Log-likelihood and effect size calculator. Retrieved April 14, 2020, from <a href="http://ucrel.lancs.ac.uk/llwizard.html" class="uri">http://ucrel.lancs.ac.uk/llwizard.html</a></li>
+<li>Wilson, A. (2013). Embracing Bayes factors for key item analysis in corpus linguistics. In New approaches to the study of linguistic variability. Language Competence and Language Awareness in Europe (pp. 3–11). Frankfurt: Peter Lang.</li>
+</ol>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

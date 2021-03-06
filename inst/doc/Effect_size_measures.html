@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ana Macanović" />
+
+
+<title>KeynessMeasures: Introduction to effect size measures</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">KeynessMeasures: Introduction to effect size measures</h1>
+<h4 class="author">Ana Macanović</h4>
+
+
+
+<div id="key-words-and-keyness" class="section level1">
+<h1>Key words and keyness</h1>
+<p align="justify">
+Used in corpus linguistics, the notion of keyness and keyness analysis is used in relation to the <strong>key word defined as “a word which occurs with unusual frequency in a given text […] by comparison with a reference corpus of some kind”</strong> (Scott, 1997). Keyness is often used in research on corpus similarity and “aboutness” (the main concepts present in the text) (Gabrielatos, 2018).
+</p>
+<div id="calculating-keyness" class="section level2">
+<h2>Calculating keyness</h2>
+<p align="justify">
+Measures that help locate key words in a corpus by comparing it to another corpus are often shared with those exploring collocations (co-occurence of two or more words). Research on corpus linguistics concerned with these topics relies on a number of statistical tests. Conventionally, Chi-square or log-likelihood statictics are used (Dunning,1993; Gabrielatos, 2018).
+</p>
+<p>In this framework, the occurence of the word is compared in two corpora:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Target corpus</strong> - the corpus of interest</li>
+<li><strong>Reference corpus</strong> - the corpus that the target corpus is being compared to.</li>
+</ol>
+<p align="justify">
+Then, a null hypothesis that there is no difference in the distribution of the occurrences of this word in the target and reference corpora is tested. Alternative hypothesis is stating that there is a difference in the occurrence between the corpora. The obtained test statistic is then compared to the critical value for the desired level of statistical significance and the words above this threshold are selected as the key words of the target corpus.
+</p>
+</div>
+<div id="statistical-significance-vs-effect-size" class="section level2">
+<h2>Statistical significance vs effect size</h2>
+<p align="justify">
+Conventionally, corpus linguistics has been relying on Chi-square and log-likelihood to explore key words in corpora. However, a body of research has been re-evaluating the use of these measures as the only tool for key word identification.
+</p>
+<p align="justify">
+While Chi-square/log-likelihood statistics do flag words which occur more frequently in the target corpus compared to the reference corpus, they do not measure the “effect size” - that is, the size of the observed difference in frequencies (Gabrielatos, 2018). This implies that we only have proof to claim that a word occurs with (statistically significant) different frequency in the target corpus compared to the reference corpus, but we cannot say anything about the size of this difference. Inquiring about the effect size would enable us to also quantify the extent of the keyness of the word. Not only corpus linguistics, but also research in social sciences could benefit of this addition to the keyness exploration.
+</p>
+<p align="justify">
+Large inconsistencies between rankings of important words by frequency differences and statistical significance measures have been observed (Gabrielatos and Marchi, 2011; Gabrielatos, 2018), implying that significance measures might not be effective in highlighting the most characteristic key word differences between the corpora. Moreover, while significance values are affected by the size of the corpora, effect size statistics are not, allowing to compare results against different studies ( Pojanapunya and Watson Todd, 2016).
+</p>
+</div>
+<div id="keyness-measures-statistical-significance-and-effect-size" class="section level2">
+<h2>Keyness measures: statistical significance and effect size</h2>
+<p>Conventionally used measures testing the significance of the difference of the occurence of a word in one versus another corpus are as follows:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Log-likelihood Ratio</strong> - as proposed by Dunning (1993)</li>
+<li><strong>Chi-squared</strong> - as used in e.g. Aarts (1971) and the <strong>Fisher Exact Test</strong> as an alternative if expected word frequencies are small (Rayson, 2003)</li>
+</ol>
+<p>Additionally, researchers have been proposing use of Bayes Factor as an alternative manner of null hypothesis testing, avoiding the limitations of p value choices:</p>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Bayesian Information Criterion</strong> - (BIC) an alternative to significance testing using p-values, as proposed by Wilson (2013).</li>
+</ol>
+<p>Researchers have proposed several effect size measures which, combined with the statistical significance testing, can improve our understanding of keyness:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Effect Size of Log Likelihood</strong> - calculation of the effect size following the log likelihood measure. Proposed by Johnston et al. (2006), implementation for corpus linguistics documented by Rayson as per his website (Rayson, 2020);</li>
+<li><strong>%DIFF</strong> - Percentage difference measure (Gabrielatos and Marchi, 2012; Gabrielatos, 2018);</li>
+<li><strong>The Relative Risk</strong> - also known as the Risk Ratio, as proposed by Kilgarriff (2009);</li>
+<li><strong>The Log Ratio Measure</strong> - the binary log of te relative risk, as proposed by Hardie (2014);</li>
+<li><strong>The Odds Ratio</strong> - the ratio of the occurence of the word in one corpus relative to its occurence in another corpus, as implemented by Rayson as per his website (Rayson, 2020);</li>
+<li><strong>Difference Coefficient</strong> - the ratio of normalised frequencies, as discussed by Hofland and Johnasson (1982, cited as per Gabrielatos, 2018);</li>
+</ol>
+<p>KeynessMeasures package provides a function that calculates these measures.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<ol style="list-style-type: decimal">
+<li>Aarts, F. G. A. M. (1971). On the distribution of noun-phrase types in English clause structure. Lingua, 26, 281–293.</li>
+<li>Dunning, T. (1993). Accurate methods for the statistics of surprise and coincidence. Computational Linguistics, 19(1), 61–74.</li>
+<li>Gabrielatos, C. (2018). Keyness analysis: Nature, metrics and techniques. In C. Taylor &amp; A. Marchi (Eds.), Corpus Approaches To Discourse: A critical review (pp. 225–258). Oxford: Routledge.</li>
+<li>Gabrielatos, C., &amp; Marchi, A. (2012). Keyness: Appropriate metrics and practical issues. Corpus-Assisted Discourse Studies International Conference.</li>
+<li>Hardie, A. (2014). Log ratio – an informal introduction. Retrieved April 14, 2020, from Post on the website of the ESRC Centre for Corpus Approaches to Social Science CASS. website: <a href="http://cass.lancs.ac.uk/?p=1133" class="uri">http://cass.lancs.ac.uk/?p=1133</a>.</li>
+<li>Johnston, J. E., Berry, K. J., &amp; Mielke, P. W. (2006). Measures of Effect Size for Chi-Squared and Likelihood-Ratio Goodness-of-Fit Tests. Perceptual and Motor Skills, 103(2), 412–414.</li>
+<li>Pojanapunya, P., &amp; Watson Todd, R. (2018). Log-likelihood and odds ratio: Keyness statistics for different purposes of keyword analysis. Corpus Linguistics and Linguistic Theory, 14(1), 133–167.</li>
+<li>Rayson, P. (2003). Matrix: A statistical method and software tool for linguistic analysis through corpus comparison. Lancaster University.</li>
+<li>Rayson, P. (2020). Log-likelihood and effect size calculator. Retrieved April 14, 2020, from <a href="http://ucrel.lancs.ac.uk/llwizard.html" class="uri">http://ucrel.lancs.ac.uk/llwizard.html</a></li>
+<li>Wilson, A. (2013). Embracing Bayes factors for key item analysis in corpus linguistics. In New approaches to the study of linguistic variability. Language Competence and Language Awareness in Europe (pp. 3–11). Frankfurt: Peter Lang.</li>
+</ol>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
