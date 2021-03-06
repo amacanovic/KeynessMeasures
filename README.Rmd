@@ -1,10 +1,6 @@
 ---
 title: "KeynessMeasures"
-author: "Ana Macanovic"
-output:
-  html_document:
-    df_print: paged
-always_allow_html: yes
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
