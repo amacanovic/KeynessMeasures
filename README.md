@@ -8,6 +8,11 @@ linguistics. Introducing both statistical significance and effect size
 measures in several simple functions.
 
 
+**This package has been updated to support new quanteda package versions (>v3). However,
+this means it will not be compatible with previous versions anymore. 
+The old functions, compatible with quanteda v2, can be found in folder R,
+in the script "frequency_table_creator_old.R".**
+
 This package currently supports the following measures:
 
 1.  **Statistical significance:** Log-likelihood ratio, Bayesian Information Criterion.

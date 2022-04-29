@@ -9,6 +9,8 @@
 #' matching value of the grouping variable are sorted into the target corpus,
 #' while all the remaining documents are sorted into the refeence corpus).
 #'
+#' This code is compatible with quanteda package version below 3.
+#'
 #' @param df a \code{data.frame}
 #' @param text_field a string; the name of the variable storing text
 #' @param grouping_variable a string; the name of the variable to be
@@ -37,7 +39,7 @@
 #'@export
 #'
 
-frequency_table_creator <-  function(df,
+frequency_table_creator_old <-  function(df,
                                      text_field = NULL,
                                      grouping_variable = NULL,
                                      grouping_variable_target = NULL,
@@ -64,8 +66,8 @@ frequency_table_creator <-  function(df,
 
   if (lemmatize) {
 
-    df <- lemmatizing_function(df, text_field = text_field)
-    text_field <- "text_lemmatized"
+   df <- lemmatizing_function(df, text_field = text_field)
+   text_field <- "text_lemmatized"
 
   }
 
@@ -97,9 +99,6 @@ frequency_table_creator <-  function(df,
   corpus <- quanteda::corpus(df,
                              text_field = text_field)
 
-  corpus <- quanteda::corpus_group(corpus,
-                         groups = get(grouping_variable))
-
 
   tokens <- quanteda::tokens(corpus,
                              remove_punct = remove_punct,
@@ -107,7 +106,8 @@ frequency_table_creator <-  function(df,
                              remove_numbers  = remove_numbers,
                              remove_url = remove_url)
 
-  dfm <- quanteda::dfm(tokens)
+  dfm <- quanteda::dfm(tokens,
+                       groups = grouping_variable)
 
   grouping_variable_target <- quanteda::docnames(dfm) == grouping_variable_target
 
@@ -116,10 +116,10 @@ frequency_table_creator <-  function(df,
                                      labels = c("target", "reference"))
 
   dfm_grouped <- quanteda::dfm_group(dfm,
-                                     groups=grouping_variable_factor)
+                           groups=grouping_variable_factor)
 
   frequency_table <- quanteda::convert(dfm_grouped,
-                                       to="data.frame")
+                             to="data.frame")
 
   rownames(frequency_table) <- frequency_table[, 1]
 

@@ -122,13 +122,13 @@ library(KeynessMeasures)
 ### Loading and preprocessing of the file ###
 
 <p align='justify'> Currently, the package works with data.frame input only. Ideally, your corpora
-would be prepared in a .csv or other filetype where the document information and text
-are both stored within a dataframe.</p>
+would be prepared in a .csv or other file type where the document information and text
+are both stored within a data frame.</p>
 
 <p align='justify'>As an example here, we will compare Jane Austen's novel "Emma" to her other
 published novels and see which key words we can idenitfy. </p>
 
-To load the data, you need to donwload, install and load the janeaustenr package:
+To load the data, you need to download, install and load the janeaustenr package:
 ```{r, eval=F, echo=T}
 install.packages("janeaustenr")
 ```

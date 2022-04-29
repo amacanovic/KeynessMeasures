@@ -3,6 +3,7 @@
 export(bic_calculator)
 export(ell_calculator)
 export(frequency_table_creator)
+export(frequency_table_creator_old)
 export(keyness_measure_calculator)
 export(log_likelihood_calculator)
 export(log_ratio_calculator)
